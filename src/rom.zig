@@ -1,5 +1,3 @@
-const printf = @import("std").io.stdout.printf;
-
 error InvalidRomSize;
 error UnknownCartridgeType;
 error UnknownRomSize;
@@ -57,6 +55,8 @@ pub const RomHeader = packed struct {
     global_checksum: [2]u8,
 
     pub fn debugPrint(header: &const RomHeader) -> %void {
+        const printf = @import("std").io.stdout.printf;
+
         // NOTE: Evaluation exceeded 1000 backwards branches if all one printf.
         %return printf(
             \\entry point               : {}
