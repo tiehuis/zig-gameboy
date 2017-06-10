@@ -17,6 +17,8 @@ pub const Mem = struct {
     pub fn loadRom(rom: &const Rom) -> Mem {
         var mem: Mem = undefined;
         mem.memory = undefined;
+
+        // TODO: Can we fix these on declaration instead since they are constant?
         mem.bank0 = mem.memory[0x0000 .. 0x3FFF];
         mem.bank1 = mem.memory[0x4000 .. 0x7FFF];
         mem.vram  = mem.memory[0x8000 .. 0x9FFF];

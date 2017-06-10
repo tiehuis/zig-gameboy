@@ -15,6 +15,9 @@ pub fn main() -> %void {
     var cpu = Cpu.init();
     cpu.mem = Mem.loadRom(&rom);
 
+    // Skip the power up sequence for the moment
+    cpu.reset();
+
     while (true) {
         cpu.step();
     }

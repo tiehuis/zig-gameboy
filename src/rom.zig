@@ -61,10 +61,10 @@ pub const RomHeader = packed struct {
         %return printf(
             \\entry point               : {}
             \\title                     : {}
-            \\cgb_flag                  : {} = {}
+            \\cgb_flag                  : {X} = {}
             \\new_licensee_code         : {}
-            \\sgb_flag                  : {} = {}
-            \\cartridge_type            : {} = {}
+            \\sgb_flag                  : {X} = {}
+            \\cartridge_type            : {X} = {}
             \\
             , header.entry_point
             , header.title
@@ -75,12 +75,12 @@ pub const RomHeader = packed struct {
         );
 
         %return printf(
-            \\rom_size                  : {} = {}
-            \\ram_size                  : {} = {}
-            \\destination code          : {} = {}
-            \\old_licensee code         : {}
-            \\mask_rom_version_number   : {}
-            \\header checksum           : {}
+            \\rom_size                  : {X} = {}
+            \\ram_size                  : {X} = {}
+            \\destination code          : {X} = {}
+            \\old_licensee code         : {X}
+            \\mask_rom_version_number   : {X}
+            \\header checksum           : {X}
             \\global checksum           : {}
             \\
             , header.rom_size , Format.romSize(header.rom_size)

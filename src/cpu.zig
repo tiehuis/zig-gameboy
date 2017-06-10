@@ -28,6 +28,34 @@ pub const Cpu = struct {
         }
     }
 
+    const resetMemoryValues = []const u16 {
+        0xFF05, 0x00, 0xFF06, 0x00, 0xFF07, 0x00, 0xFF10, 0x80, 0xFF11, 0xBF, 0xFF12, 0xF3,
+        0xFF14, 0xBF, 0xFF16, 0x3F, 0xFF17, 0x00, 0xFF19, 0xBF, 0xFF1A, 0x7A, 0xFF1B, 0xFF,
+        0xFF1C, 0x9F, 0xFF1E, 0xBF, 0xFF20, 0xFF, 0xFF21, 0x00, 0xFF22, 0x00, 0xFF23, 0xBF,
+        0xFF24, 0x77, 0xFF25, 0xF3, 0xFF26, 0xF1, 0xFF40, 0x91, 0xFF42, 0x00, 0xFF43, 0x00,
+        0xFF45, 0x00, 0xFF47, 0xFC, 0xFF48, 0xFF, 0xFF49, 0xFF, 0xFF4A, 0x00, 0xFF4B, 0x00,
+        0xFFFF, 0x00,
+    };
+
+    pub fn reset(cpu: &Cpu) {
+        cpu.ticks = 0;
+        cpu.regs.a  = 0x01;
+        cpu.regs.b  = 0x00;
+        cpu.regs.c  = 0x13;
+        cpu.regs.d  = 0x00;
+        cpu.regs.e  = 0xD8;
+        cpu.regs.h  = 0x01;
+        cpu.regs.l  = 0x4D;
+        cpu.regs.f  = 0xB0;
+        cpu.regs.sp = 0xFFFE;
+        cpu.regs.pc = 0x0100;
+
+        var i: usize = 0;
+        while (i < resetMemoryValues.len) : (i += 2) {
+            cpu.mem.write8(resetMemoryValues[i], u8(resetMemoryValues[i + 1]));
+        }
+    }
+
     // Fetch, decode, execute a single instruction.
     pub fn step(cpu: &Cpu) {
         const inst = cpu.mem.read8(cpu.regs.pc);
@@ -41,19 +69,19 @@ pub const Cpu = struct {
     pub fn debugPrint(cpu: &const Cpu) -> %void {
         // NOTE: Evaluation exceeded 1000 backwards branches if all one printf.
         %return printf(
-            \\instruction : {}
+            \\instruction : {X}
             \\ticks       : {}
             \\registers:
-            \\  a     : {}
-            \\  b     : {}
-            \\  c     : {}
-            \\  d     : {}
-            \\  e     : {}
-            \\  h     : {}
-            \\  l     : {}
-            \\  flags : {}
-            \\  sp    : {}
-            \\  pc    : {}
+            \\  a     : {X}
+            \\  b     : {X}
+            \\  c     : {X}
+            \\  d     : {X}
+            \\  e     : {X}
+            \\  h     : {X}
+            \\  l     : {X}
+            \\  flags : {X}
+            \\  sp    : {X}
+            \\  pc    : {X}
             \\
             , cpu.mem.read8(cpu.regs.pc -% 1)
             , cpu.ticks
