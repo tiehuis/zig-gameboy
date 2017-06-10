@@ -1,8 +1,9 @@
 const std = @import("std");
+const inst = @import("inst.zig");
 const Mem = @import("mem.zig").Mem;
 const printf = @import("std").io.stdout.printf;
 
-const Registers = struct {
+pub const Registers = struct {
     a: u8,
     b: u8,
     c: u8,
@@ -58,20 +59,39 @@ pub const Cpu = struct {
 
     // Fetch, decode, execute a single instruction.
     pub fn step(cpu: &Cpu) {
-        const inst = cpu.mem.read8(cpu.regs.pc);
+        const opcode = cpu.mem.read8(cpu.regs.pc);
         cpu.regs.pc += 1;
 
-        switch (inst) {
+        switch (opcode) {
+            0x00 => cpu.call0(inst.nop),
             else => cpu.unknownInstruction(),
         }
+
+        cpu.ticks += inst.tick_table[opcode];
+    }
+
+    fn call0(cpu: &Cpu, comptime func: fn(&Cpu)) {
+        @inlineCall(func, cpu);
+    }
+
+    fn call1(cpu: &Cpu, comptime func: fn(&Cpu, u8)) {
+        const operand = cpu.mem.read8(cpu.regs.pc);
+        cpu.regs.pc += 1;
+        @inlineCall(func, cpu, operand);
+    }
+
+    fn call2(cpu: &Cpu, comptime func: fn(&Cpu, u16)) {
+        const operand = cpu.mem.read16(cpu.regs.pc);
+        cpu.regs.pc += 2;
+        @inlineCall(func, cpu, operand);
     }
 
     pub fn debugPrint(cpu: &const Cpu) -> %void {
         // NOTE: Evaluation exceeded 1000 backwards branches if all one printf.
         %return printf(
-            \\instruction : {X}
-            \\ticks       : {}
-            \\registers:
+            \\last opcode  : {X}
+            \\ticks        : {}
+            \\registers
             \\  a     : {X}
             \\  b     : {X}
             \\  c     : {X}
