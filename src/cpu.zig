@@ -11,9 +11,16 @@ pub const Registers = struct {
     e: u8,
     h: u8,
     l: u8,
-    f: u8,
+    flags: u8,
     sp: u16,
     pc: u16,
+};
+
+pub const Flags = struct {
+    const Zero: u8      = 0b1000000;
+    const Negative: u8  = 0b0100000;
+    const HalfCarry: u8 = 0b0010000;
+    const Carry: u8     = 0b0001000;
 };
 
 pub const Cpu = struct {
@@ -47,7 +54,7 @@ pub const Cpu = struct {
         cpu.regs.e  = 0xD8;
         cpu.regs.h  = 0x01;
         cpu.regs.l  = 0x4D;
-        cpu.regs.f  = 0xB0;
+        cpu.regs.flags = 0xB0;
         cpu.regs.sp = 0xFFFE;
         cpu.regs.pc = 0x0100;
 
@@ -60,10 +67,37 @@ pub const Cpu = struct {
     // Fetch, decode, execute a single instruction.
     pub fn step(cpu: &Cpu) {
         const opcode = cpu.mem.read8(cpu.regs.pc);
+        %%printf("{X4} {X2}\n", cpu.regs.pc, opcode);
         cpu.regs.pc += 1;
 
         switch (opcode) {
             0x00 => cpu.call0(inst.nop),
+            0x05 => cpu.call0(inst.dec_b),
+            0x06 => cpu.call1(inst.ld_b),
+            0x0E => cpu.call1(inst.ld_c),
+            0x14 => cpu.call0(inst.inc_d),
+            0x15 => cpu.call0(inst.dec_d),
+            0x1F => cpu.call0(inst.rra),
+            0x20 => cpu.call1(inst.jr_nz),
+            0x21 => cpu.call2(inst.ld_hl),
+            0x32 => cpu.call0(inst.ldd_hlp_a),
+            0xC3 => cpu.call2(inst.jp),
+            0x78 => cpu.call0(inst.ld_a_b),
+            0x79 => cpu.call0(inst.ld_a_c),
+            0x7A => cpu.call0(inst.ld_a_d),
+            0x7B => cpu.call0(inst.ld_a_e),
+            0x7C => cpu.call0(inst.ld_a_h),
+            0x7D => cpu.call0(inst.ld_a_l),
+            0x88 => cpu.call0(inst.adc_b),
+            0x89 => cpu.call0(inst.adc_c),
+            0x8A => cpu.call0(inst.adc_d),
+            0x8B => cpu.call0(inst.adc_e),
+            0x8C => cpu.call0(inst.adc_h),
+            0x8D => cpu.call0(inst.adc_l),
+            0xAF => cpu.call0(inst.xor_a),
+            // 0xDF => cpu.call0(inst.rst_18),
+            0xE0 => cpu.call1(inst.ld_ff_n_ap),
+            0xFF => cpu.call0(inst.rst_38),
             else => cpu.unknownInstruction(),
         }
 
@@ -86,22 +120,32 @@ pub const Cpu = struct {
         @inlineCall(func, cpu, operand);
     }
 
+    pub fn pushStack16(cpu: &Cpu, value: u16) {
+        cpu.regs.sp -= 2;
+        cpu.mem.write16(cpu.regs.sp, value);
+    }
+
+    pub fn popStack16(cpu: &Cpu) -> u16 {
+        const value = cpu.mem.read16(cpu.regs.sp);
+        cpu.regs.sp += 2;
+    }
+
     pub fn debugPrint(cpu: &const Cpu) -> %void {
         // NOTE: Evaluation exceeded 1000 backwards branches if all one printf.
         %return printf(
-            \\last opcode  : {X}
+            \\last opcode  : {X2}
             \\ticks        : {}
             \\registers
-            \\  a     : {X}
-            \\  b     : {X}
-            \\  c     : {X}
-            \\  d     : {X}
-            \\  e     : {X}
-            \\  h     : {X}
-            \\  l     : {X}
-            \\  flags : {X}
-            \\  sp    : {X}
-            \\  pc    : {X}
+            \\  a     : {X2}
+            \\  b     : {X2}
+            \\  c     : {X2}
+            \\  d     : {X2}
+            \\  e     : {X2}
+            \\  h     : {X2}
+            \\  l     : {X2}
+            \\  flags : {X2}
+            \\  sp    : {X4}
+            \\  pc    : {X4}
             \\
             , cpu.mem.read8(cpu.regs.pc -% 1)
             , cpu.ticks
@@ -112,7 +156,7 @@ pub const Cpu = struct {
             , cpu.regs.e
             , cpu.regs.h
             , cpu.regs.l
-            , cpu.regs.f
+            , cpu.regs.flags
             , cpu.regs.sp
             , cpu.regs.pc
         );
