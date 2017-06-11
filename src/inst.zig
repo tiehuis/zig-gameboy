@@ -100,6 +100,11 @@ fn dec(cpu: &Cpu, value: u8) -> u8 {
 // 0x00
 pub fn nop(cpu: &Cpu) {}
 
+// 0x04
+pub fn inc_b(cpu: &Cpu) {
+    cpu.regs.b = inc(cpu, cpu.regs.b);
+}
+
 // 0x05
 pub fn dec_b(cpu: &Cpu) {
     cpu.regs.b = dec(cpu, cpu.regs.b);
@@ -110,6 +115,16 @@ pub fn ld_b(cpu: &Cpu, op: u8) {
     cpu.regs.b = op;
 }
 
+// 0x0C
+pub fn inc_c(cpu: &Cpu) {
+    cpu.regs.c = inc(cpu, cpu.regs.c);
+}
+
+// 0x0D
+pub fn dec_c(cpu: &Cpu) {
+    cpu.regs.c = dec(cpu, cpu.regs.c);
+}
+
 // 0x14
 pub fn inc_d(cpu: &Cpu) {
     cpu.regs.d = inc(cpu, cpu.regs.d);
@@ -118,6 +133,31 @@ pub fn inc_d(cpu: &Cpu) {
 // 0x15
 pub fn dec_d(cpu: &Cpu) {
     cpu.regs.d = dec(cpu, cpu.regs.d);
+}
+
+// 0x16
+pub fn ld_d(cpu: &Cpu, op: u8) {
+    cpu.regs.d = op;
+}
+
+// 0x18
+pub fn jr_n(cpu: &Cpu, op: u8) {
+    cpu.regs.pc += op;
+}
+
+// 0x1C
+pub fn inc_e(cpu: &Cpu) {
+    cpu.regs.e = inc(cpu, cpu.regs.e);
+}
+
+// 0x1D
+pub fn dec_e(cpu: &Cpu) {
+    cpu.regs.e = dec(cpu, cpu.regs.e);
+}
+
+// 0x1E
+pub fn ld_e(cpu: &Cpu, op: u8) {
+    cpu.regs.e = op;
 }
 
 // 0x1F
@@ -152,6 +192,36 @@ pub fn ld_hl(cpu: &Cpu, op: u16) {
     cpu.regs.l = u8(op & 0xFF);
 }
 
+// 0x24
+pub fn inc_h(cpu: &Cpu) {
+    cpu.regs.h = inc(cpu, cpu.regs.h);
+}
+
+// 0x25
+pub fn dec_h(cpu: &Cpu) {
+    cpu.regs.h = dec(cpu, cpu.regs.h);
+}
+
+// 0x26
+pub fn ld_h(cpu: &Cpu, op: u8) {
+    cpu.regs.h = op;
+}
+
+// 0x2C
+pub fn inc_l(cpu: &Cpu) {
+    cpu.regs.l = inc(cpu, cpu.regs.l);
+}
+
+// 0x2D
+pub fn dec_l(cpu: &Cpu) {
+    cpu.regs.l = dec(cpu, cpu.regs.l);
+}
+
+// 0x2E
+pub fn ld_l(cpu: &Cpu, op: u8) {
+    cpu.regs.l = op;
+}
+
 // 0x32
 pub fn ldd_hlp_a(cpu: &Cpu) {
     var hl = (u16(cpu.regs.h) << 8) | u16(cpu.regs.l);
@@ -159,6 +229,207 @@ pub fn ldd_hlp_a(cpu: &Cpu) {
     hl = hl -% 1;
     cpu.regs.h = u8(hl >> 8);
     cpu.regs.l = u8(hl & 0xFF);
+}
+
+// 0x37
+pub fn scf(cpu: &Cpu) {
+    cpu.regs.flags |= Flags.Carry;
+    cpu.regs.flags &= ~(Flags.Negative | Flags.HalfCarry);
+}
+
+// 0x3C
+pub fn inc_a(cpu: &Cpu) {
+    cpu.regs.a = inc(cpu, cpu.regs.a);
+}
+
+// 0x3D
+pub fn dec_a(cpu: &Cpu) {
+    cpu.regs.a = dec(cpu, cpu.regs.a);
+}
+
+// 0x3E
+pub fn ld_a(cpu: &Cpu, op: u8) {
+    cpu.regs.a = op;
+}
+
+// 0x41
+pub fn ld_b_c(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.c;
+}
+
+// 0x42
+pub fn ld_b_d(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.d;
+}
+
+// 0x43
+pub fn ld_b_e(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.e;
+}
+
+// 0x44
+pub fn ld_b_h(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.h;
+}
+
+// 0x45
+pub fn ld_b_l(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.l;
+}
+
+// 0x47
+pub fn ld_b_a(cpu: &Cpu) {
+    cpu.regs.b = cpu.regs.a;
+}
+
+// 0x48
+pub fn ld_c_b(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.b;
+}
+
+// 0x4A
+pub fn ld_c_d(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.d;
+}
+
+// 0x4B
+pub fn ld_c_e(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.e;
+}
+
+// 0x4C
+pub fn ld_c_h(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.h;
+}
+
+// 0x4D
+pub fn ld_c_l(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.l;
+}
+
+// 0x4F
+pub fn ld_c_a(cpu: &Cpu) {
+    cpu.regs.c = cpu.regs.a;
+}
+
+// 0x50
+pub fn ld_d_b(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.b;
+}
+
+// 0x51
+pub fn ld_d_c(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.c;
+}
+
+// 0x53
+pub fn ld_d_e(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.e;
+}
+
+// 0x54
+pub fn ld_d_h(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.h;
+}
+
+// 0x55
+pub fn ld_d_l(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.l;
+}
+
+// 0x57
+pub fn ld_d_a(cpu: &Cpu) {
+    cpu.regs.d = cpu.regs.a;
+}
+
+// 0x58
+pub fn ld_e_b(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.b;
+}
+
+// 0x59
+pub fn ld_e_c(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.c;
+}
+
+// 0x5A
+pub fn ld_e_d(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.d;
+}
+
+// 0x5C
+pub fn ld_e_h(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.h;
+}
+
+// 0x5D
+pub fn ld_e_l(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.l;
+}
+
+// 0x5F
+pub fn ld_e_a(cpu: &Cpu) {
+    cpu.regs.e = cpu.regs.a;
+}
+
+// 0x60
+pub fn ld_h_b(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.b;
+}
+
+// 0x61
+pub fn ld_h_c(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.c;
+}
+
+// 0x62
+pub fn ld_h_d(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.d;
+}
+
+// 0x63
+pub fn ld_h_e(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.e;
+}
+
+// 0x65
+pub fn ld_h_l(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.l;
+}
+
+// 0x67
+pub fn ld_h_a(cpu: &Cpu) {
+    cpu.regs.h = cpu.regs.a;
+}
+
+// 0x68
+pub fn ld_l_b(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.b;
+}
+
+// 0x69
+pub fn ld_l_c(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.c;
+}
+
+// 0x6A
+pub fn ld_l_d(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.d;
+}
+
+// 0x6B
+pub fn ld_l_e(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.e;
+}
+
+// 0x6C
+pub fn ld_l_h(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.h;
+}
+
+// 0x6F
+pub fn ld_l_a(cpu: &Cpu) {
+    cpu.regs.l = cpu.regs.a;
 }
 
 // 0x78
