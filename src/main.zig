@@ -1,9 +1,8 @@
 const std = @import("std");
-const Rom = @import("rom.zig").Rom;
-const Cpu = @import("cpu.zig").Cpu;
-const Mem = @import("mem.zig").Mem;
 const printf = std.io.stdout.printf;
 const readByte = std.io.stdin.readByte;
+const Rom = @import("rom.zig").Rom;
+const Gameboy = @import("gameboy.zig").Gameboy;
 
 const want_step = false;
 
@@ -30,19 +29,15 @@ pub fn main() -> %void {
     %%rom.header.debugPrint();
     %%stepWait();
 
-    var cpu = Cpu.init();
-    cpu.mem = Mem.loadRom(&rom);
-
-    // Skip the power up sequence for the moment
-    cpu.reset();
+    var gb = Gameboy.init(&rom);
 
     while (true) {
         %%clearScreen();
-        cpu.step();
+        gb.cpu.step();
 
         // Allow stepping through and verifying registers
         if (want_step) {
-            %%cpu.debugPrint();
+            %%gb.cpu.debugPrint();
         }
         %%stepWait();
     }

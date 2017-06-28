@@ -24,15 +24,20 @@ pub const Flags = struct {
 };
 
 pub const Cpu = struct {
+    // TODO: Store interrupt details on CPU instead.
+    // TODO: Also store GPU here since we don't really have one itself.
+
+    ime: bool,
     ticks: u64,
     regs: Registers,
-    mem: Mem,
+    mem: &Mem,
 
-    pub fn init() -> Cpu {
+    pub fn init(mem: &Mem) -> Cpu {
         Cpu {
+            .ime = true,
             .ticks = 0,
             .regs = undefined,
-            .mem = undefined,
+            .mem = mem,
         }
     }
 
@@ -147,7 +152,6 @@ pub const Cpu = struct {
             0x7B => cpu.call0(inst.ld_a_e),
             0x7C => cpu.call0(inst.ld_a_h),
             0x7D => cpu.call0(inst.ld_a_l),
-
             0x88 => cpu.call0(inst.adc_b),
             0x89 => cpu.call0(inst.adc_c),
             0x8A => cpu.call0(inst.adc_d),
@@ -160,6 +164,7 @@ pub const Cpu = struct {
             0xC3 => cpu.call2(inst.jp),
 
             // 0xDF => cpu.call0(inst.rst_18),
+            0xD9 => cpu.call0(inst.reti),
 
             0xE0 => cpu.call1(inst.ld_ff_n_ap),
 
@@ -195,6 +200,7 @@ pub const Cpu = struct {
     pub fn popStack16(cpu: &Cpu) -> u16 {
         const value = cpu.mem.read16(cpu.regs.sp);
         cpu.regs.sp += 2;
+        value
     }
 
     pub fn debugPrint(cpu: &const Cpu) -> %void {

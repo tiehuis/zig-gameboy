@@ -2,7 +2,7 @@ const std = @import("std");
 const Rom = @import("rom.zig").Rom;
 
 pub const Mem = struct {
-    memory: [0xFFFF]u8,
+    memory: [0x10000]u8,
     bank0: []u8,
     bank1: []u8,
     vram:  []u8,
@@ -46,41 +46,7 @@ pub const Mem = struct {
     }
 
     pub fn read8(mem: &const Mem, address: u16) -> u8 {
-        switch (address) {
-            0xFF04 => {
-                0 // Div timer
-            },
-
-            0xFF40 => {
-                0 // Gpu control
-            },
-
-            0xFF42 => {
-                0 // Gpu scroll y
-            },
-
-            0xFF43 => {
-                0 // Gpu scroll x
-            },
-
-            0xFF44 => {
-                0 // Gpu Scanline
-            },
-
-            0xFF00 => {
-                0 // Key input
-            },
-
-            0xFF0F => {
-                0 // Interrupt flags
-            },
-
-            0xFFFF => {
-                0 // Interrupt enable
-            },
-
-            else => mem.memory[address],
-        }
+        mem.memory[address]
     }
 
     pub fn read16(mem: &const Mem, address: u16) -> u16 {
@@ -89,44 +55,30 @@ pub const Mem = struct {
 
     pub fn write8(mem: &Mem, address: u16, value: u8) {
         switch (address) {
-            0x8000 ... 0x97FF => {
-                // Update tile
+            0x0000 ... 0x7FFF => {
+                // read-only segments
+                //
+                // NOTE: When an MBC is present, portions of this address space become writable and
+                // and modify rom/ram banking options.
             },
 
-            0xFF40 => {
-                // Gpu control
+            // First 1K of WRAM echos to ECHO RAM and vice-versa
+            0xC000 ... 0xDDFF => {
+                mem.memory[address] = value;
+                mem.memory[address + 0x2000] = value;
             },
 
-            0xFF42 => {
-                // Gpu scroll y
+            0xE000 ... 0xFDFF => {
+                mem.memory[address] = value;
+                mem.memory[address - 0x2000] = value;
             },
 
-            0xFF43 => {
-                // Gpu scroll x
+            0xFF00 => {
+                mem.memory[address] = value & 0xF0;
             },
 
-            0xFF46 => {
-                // Dma copy
-            },
-
-            0xFF47 => {
-                // Pallette copy0
-            },
-
-            0xFF48 => {
-                // Pallette copy1
-            },
-
-            0xFF49 => {
-                // Pallette copy2
-            },
-
-            0xFF0F => {
-                // Interrupt flags
-            },
-
-            0xFFFF => {
-                // Interrupt enable
+            0xFF04 => {
+                mem.memory[address] = 0;
             },
 
             else => {

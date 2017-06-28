@@ -507,6 +507,12 @@ pub fn xor_a(cpu: &Cpu) {
     xor(cpu, cpu.regs.a);
 }
 
+// 0xD9
+pub fn reti(cpu: &Cpu) {
+    cpu.ime = true;
+    cpu.regs.pc = cpu.popStack16();
+}
+
 // 0xDF
 pub fn rst_18(cpu: &Cpu) {
     cpu.pushStack16(cpu.regs.pc);
