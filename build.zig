@@ -10,7 +10,7 @@ pub fn build(b: &Builder) {
     b.installArtifact(exe);
 
     const play = b.step("run", "Run the emulator");
-    const run = b.addCommand(".", b.env_map, exe.getOutputPath(), [][]const u8{});
+    const run = b.addCommand(".", b.env_map, [][]const u8{ exe.getOutputPath() });
     play.dependOn(&run.step);
     run.step.dependOn(&exe.step);
 }

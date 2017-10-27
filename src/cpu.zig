@@ -238,6 +238,6 @@ pub const Cpu = struct {
     fn unknownInstruction(cpu: &const Cpu) -> noreturn {
         %%printf("\n<== unknown instruction! ==>\n");
         %%cpu.debugPrint();
-        std.os.abort();
+        std.os.exit(1);
     }
 };
