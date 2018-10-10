@@ -1,44 +1,23 @@
 const std = @import("std");
-const printf = std.io.stdout.printf;
-const readByte = std.io.stdin.readByte;
-const Rom = @import("rom.zig").Rom;
-const Gameboy = @import("gameboy.zig").Gameboy;
+const Gameboy = @import("gameboy.zig").Gb;
 
-const want_step = false;
+pub fn main() !void {
+    var direct = std.heap.DirectAllocator.init();
+    var allocator = &direct.allocator;
 
-fn clearScreen() -> %void {
-    if (want_step) {
-        %return printf("{c}[2J{c}[H", u8(0x1B), u8(0x1B));
+    const args = try std.os.argsAlloc(allocator);
+    defer std.os.argsFree(allocator, args);
+
+    if (args.len < 2) {
+        std.debug.warn("gameboy <rom>\n");
+        std.os.exit(1);
     }
-}
 
-fn stepWait() -> %void {
-    if (want_step) {
-        _ = %%readByte();
-    }
-}
+    const rom = try std.io.readFileAlloc(allocator, args[1]);
+    defer allocator.free(rom);
 
-pub fn main() -> %void {
-    const rom = Rom.load() %% |err| {
-        %%printf("could not load rom: {}\n", err);
-        return;
-    };
+    var gb = try Gameboy.init(rom);
+    defer gb.deinit();
 
-    %%clearScreen();
-    %%printf("<== rom details ==>\n");
-    %%rom.header.debugPrint();
-    %%stepWait();
-
-    var gb = Gameboy.init(&rom);
-
-    while (true) {
-        %%clearScreen();
-        gb.cpu.step();
-
-        // Allow stepping through and verifying registers
-        if (want_step) {
-            %%gb.cpu.debugPrint();
-        }
-        %%stepWait();
-    }
+    gb.run();
 }

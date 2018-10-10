@@ -1,0 +1,6 @@
+[submodule "lib/zig-window"]
+	path = lib/zig-window
+	url = https://github.com/andrewrk/zig-window
+[submodule "lib/zig-sdl2"]
+	path = lib/zig-sdl2
+	url = https://github.com/tiehuis/zig-sdl2
