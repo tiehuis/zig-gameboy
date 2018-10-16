@@ -1,0 +1,11 @@
+# Get
+
+    git clone --recursive https://github.com/tiehuis/zig-gameboy
+
+# Build
+
+    zig build
+
+# Dependencies
+
+ - SDL2
