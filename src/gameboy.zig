@@ -1,5 +1,5 @@
 const std = @import("std");
-const time = std.os.time;
+const time = std.time;
 
 const Window = @import("window_sdl.zig").Window;
 const irom = @import("rom.zig");
@@ -18,9 +18,9 @@ pub const Gb = struct {
     prng: std.rand.DefaultPrng,
 
     pub fn init(rom_binary: []u8) !Gb {
-        var buf: [8]u8 = undefined;
-        try std.os.getRandomBytes(buf[0..]);
-        const seed = std.mem.readIntLE(u64, buf[0..8]);
+        var buf: [4]u8 = undefined;
+        try std.crypto.randomBytes(buf[0..]);
+        const seed = std.mem.readIntSliceLittle(u32, buf[0..4]);
 
         var gb: Gb = undefined;
         gb.rom = try irom.Rom.load(rom_binary);

@@ -5,8 +5,8 @@ pub fn main() !void {
     var direct = std.heap.DirectAllocator.init();
     var allocator = &direct.allocator;
 
-    const args = try std.os.argsAlloc(allocator);
-    defer std.os.argsFree(allocator, args);
+    const args = try std.process.argsAlloc(allocator);
+    defer std.process.argsFree(allocator, args);
 
     if (args.len < 2) {
         std.debug.warn("gameboy <rom>\n");

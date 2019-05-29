@@ -22,7 +22,7 @@ pub const Mmu = struct {
     joyp_bit: [2]u8,
     joyp_active: u1,
 
-    fn init(mem: []u8, rom: *Rom) Mmu {
+    pub fn init(mem: []u8, rom: *Rom) Mmu {
         var mmu: Mmu = undefined;
         mmu.mem = mem;
         mmu.mbc = Mbc.init(rom);
@@ -44,7 +44,7 @@ pub const Mmu = struct {
         return mmu;
     }
 
-    fn read(self: *Mmu, address: u16) u8 {
+    pub fn read(self: *Mmu, address: u16) u8 {
         switch (address) {
             // ROM/RAM banks
             0x0000...0x7FFF, 0xA000...0xBFFF => {
@@ -83,7 +83,7 @@ pub const Mmu = struct {
         }
     }
 
-    fn write(self: *Mmu, address: u16, value: u8) void {
+    pub fn write(self: *Mmu, address: u16, value: u8) void {
         switch (address) {
             // ROM/RAM banks
             0x0000...0x7FFF, 0xA000...0xBFFF => {
